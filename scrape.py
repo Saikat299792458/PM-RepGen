@@ -1,19 +1,6 @@
 from docx import Document
 import pandas as pd
-from openpyxl import load_workbook
 from extractors import extractors
-
-def format(filename):
-    """Formats the excel workbook"""
-    # Step 4: Merge Cells in the Header Using OpenPyXL
-    wb = load_workbook(filename)
-    ws = wb.active
-
-    # Merge header for "Condition of the body"
-    ws.merge_cells(start_row=1, start_column=11, end_row=1, end_column=13)  # Columns J to L
-
-    # Save the modified file
-    wb.save(filename)
 
 def main():
     doc = Document("test.docx") # Load the .docx file
@@ -59,14 +46,16 @@ def main():
     ("Name","","",""), 
     ("Sex","","",""), 
     ("Age","","",""), 
-    ("Manner of Death","Natural","",""),
-    ("Manner of Death","Unnatural","Suicide",""),
-    ("Manner of Death","Unnatural","Homicide",""),
-    ("Manner of Death","Unnatural","Accident",""),
     ("Condition of the body", "Built","",""), 
     ("Condition of the body", "Rigor Mortis","All Over",""), 
     ("Condition of the body", "Rigor Mortis","Partial",""), 
     ("Condition of the body", "Decomposition","",""),
+    ("Tattoo Marks", "", "", ""),
+    ("Bladder", "", "", ""),
+    ("Genitalia", "Male", "", ""),
+    ("Genitalia", "Female", "Uterus", ""),
+    ("Genitalia", "Female", "Vagina", ""),
+    ("Genitalia", "Female", "Hymen", ""),
     ("Viscera Sent", "Yes", "Chemical Analysis", "Routine"),
     ("Viscera Sent", "Yes", "Chemical Analysis", "Others"),
     ("Viscera Sent", "Yes", "Histopathological Examination", ""),
@@ -74,22 +63,52 @@ def main():
     ("Viscera Sent", "Yes", "Microscopic Examination", "Others"),
     ("Viscera Sent", "Yes", "DNA Analysis", ""),
     ("Viscera Sent", "No", "", ""),
-    ("Bladder", "", "", ""),
-    ("Genitalia", "Male", "", ""),
-    ("Genitalia", "Female", "Uterus", ""),
-    ("Genitalia", "Female", "Vagina", ""),
-    ("Genitalia", "Female", "Hymen", ""),
+    ("Mode of Death", "", "", ""),
+    ("Manner of Death","Natural","",""),
+    ("Manner of Death","Unnatural","Suicide",""),
+    ("Manner of Death","Unnatural","Homicide",""),
+    ("Manner of Death","Unnatural","Accident",""),
+    ("Cause of Death", "Hanging", "", ""),
+    ("Cause of Death", "Strangulation", "", ""),
+    ("Cause of Death", "Suffocation", "", ""),
+    ("Cause of Death", "Drowning", "", ""),
+    ("Cause of Death", "Poison", "", ""),
+    ("Cause of Death", "Burn", "", ""),
+    ("Cause of Death", "Electrocution", "", ""),
+    ("Cause of Death", "Injury", "Blunt Weapon", "Abrasion"),
+    ("Cause of Death", "Injury", "Blunt Weapon", "Bruise"),
+    ("Cause of Death", "Injury", "Blunt Weapon", "Laceration"),
+    ("Cause of Death", "Injury", "Blunt Weapon", "Fracture"),
+    ("Cause of Death", "Injury", "Blunt Weapon", "Dislocation"),
+    ("Cause of Death", "Injury", "Sharp Weapon", "Incised Wound"),
+    ("Cause of Death", "Injury", "Sharp Weapon", "Chop Wound"),
+    ("Cause of Death", "Injury", "Sharp Weapon", "Stab Wound"),
+    ("Cause of Death", "Injury", "Self Inflicted Wound", ""),
+    ("Cause of Death", "Injury", "Fabricated Wound", ""),
+    ("Cause of Death", "Injury", "Defence Wound", ""),
+    ("Cause of Death", "Injury", "Surgical Wound", ""),
+    ("Cause of Death", "Injury", "Gun Shot Injury", ""),
+    ("Cause of Death", "Fall from Height", "", ""),
+    ("Cause of Death", "Road Traffic Accident", "", "")
 ])
 
     data = [list(d.values()) for d in data]
     #print(data)
     filename = "PM_Basic_Info.xlsx"
     df = pd.DataFrame(data, columns=columns)
-    #df.index = range(1, len(df) + 1)
-    df.index.name=None
+    df.index = range(1, len(df) + 1)
+    df.index.name="Sl No."
     #df.insert(0, "Sl No.", range(1, len(df) + 1)) # Add Sl No. as the primary key
-    df.to_excel(filename) # Save the DataFrame to an Excel file
-    #format(filename)
+    #df.to_excel(filename) # Save the DataFrame to an Excel file
+    writer = pd.ExcelWriter(filename, engine="xlsxwriter")
+    df.to_excel(writer, sheet_name="Sheet1")
+
+    # Get workbook and worksheet objects
+    workbook = writer.book
+    worksheet = writer.sheets["Sheet1"]
+
+    worksheet.autofit()
+    writer.close()
 
 if __name__ == "__main__":
     main()

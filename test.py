@@ -5,9 +5,9 @@ from bijoy2unicode import converter
 doc = Document("test.docx")
 test = converter.Unicode()
 
-table = doc.tables[58]
-row1 = table.rows[10]
-cell = row1.cells[2]
+table = doc.tables[2]
+row1 = table.columns[2]
+cell = row1.cells[1]
 toprint = test.convertBijoyToUnicode(cell.text.strip())
 print(toprint)
 print(cell.text.strip())
